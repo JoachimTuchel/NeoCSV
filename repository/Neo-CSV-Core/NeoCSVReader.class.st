@@ -460,13 +460,21 @@ NeoCSVReader >> readHeader [
 	This sets the fieldCount (but fieldAccessors overrides fieldCount)."
 
 	| names |
-	names := Array streamContents: [ :out |
-		 [ self readAtEndOrEndOfLine ]
-			whileFalse: [ 
-				out nextPut: self readField.
-				(self readSeparator and: [ self atEnd or: [ self peekEndOfLine ] ])
-					ifTrue: [ out nextPut: emptyFieldValue ] ] ].
+	names := self readNextLineAsArray.
 	self fieldCount: names size.
+	^ names
+]
+
+{ #category : #accessing }
+NeoCSVReader >> readNextLineAsArray [
+	| names |
+	names := Array
+		streamContents: [ :out | 
+			[ self readAtEndOrEndOfLine ]
+				whileFalse: [ out nextPut: self readField.
+					(self readSeparator
+						and: [ self atEnd or: [ self peekEndOfLine ] ])
+						ifTrue: [ out nextPut: emptyFieldValue ] ] ].
 	^ names
 ]
 
